@@ -26,6 +26,25 @@ jobs:
           unzip -q /tmp/CodigoEstradaPT_Android_v0.4.zip -d /tmp/codigo-build
           test -f /tmp/codigo-build/codigo_estrada_pt_app/settings.gradle.kts
 
+      - name: Align Java and Kotlin to JVM 17
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('/tmp/codigo-build/codigo_estrada_pt_app/app/build.gradle.kts')
+          s = p.read_text()
+          needle = '    buildFeatures { compose = true }\n'
+          replacement = '''    compileOptions {
+              sourceCompatibility = JavaVersion.VERSION_17
+              targetCompatibility = JavaVersion.VERSION_17
+          }
+
+              buildFeatures { compose = true }
+          '''
+          if needle not in s:
+              raise SystemExit('Expected buildFeatures marker not found')
+          p.write_text(s.replace(needle, replacement, 1))
+          PY
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
