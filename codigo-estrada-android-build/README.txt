@@ -1,0 +1,1 @@
+Temporary isolated branch used only to build the Código da Estrada PT Android APK. Main branch is untouched.
