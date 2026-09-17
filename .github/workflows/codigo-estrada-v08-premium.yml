@@ -34,7 +34,18 @@ jobs:
           unzip -qo /tmp/CodigoEstradaPT_v0.8_patch.zip -d /tmp/codigo-v08/codigo_estrada_pt_app
           cd /tmp/codigo-v08/codigo_estrada_pt_app
           python3 apply_base_edits.py
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('app/build.gradle.kts')
+          s = p.read_text()
+          needle = '    buildFeatures { compose = true }\n'
+          insert = '''    compileOptions {\n        sourceCompatibility = JavaVersion.VERSION_17\n        targetCompatibility = JavaVersion.VERSION_17\n    }\n\n'''
+          if 'sourceCompatibility = JavaVersion.VERSION_17' not in s:
+              s = s.replace(needle, insert + needle)
+          p.write_text(s)
+          PY
           grep -q 'versionName = "0.8.0"' app/build.gradle.kts
+          grep -q 'sourceCompatibility = JavaVersion.VERSION_17' app/build.gradle.kts
           test -f app/src/main/java/pt/carreira/codigoestrada/ContentV7.kt
 
       - name: Set up JDK 17
