@@ -1,4 +1,4 @@
-name: Codigo Estrada PT - Build APK
+name: Codigo Estrada PT - Build Premium v0.8 APK
 
 on:
   workflow_dispatch:
@@ -24,11 +24,8 @@ jobs:
             codigo-estrada-android-build/v0.8/payload/chunk_01.b64 \
             codigo-estrada-android-build/v0.8/payload/chunk_02.b64 \
             codigo-estrada-android-build/v0.8/payload/chunk_03.b64 \
-            codigo-estrada-android-build/v0.8/payload/chunk_04a.b64 \
-            codigo-estrada-android-build/v0.8/payload/chunk_04b.b64 \
-            codigo-estrada-android-build/v0.8/payload/chunk_05a.b64 \
-            codigo-estrada-android-build/v0.8/payload/chunk_05b1.b64 \
-            codigo-estrada-android-build/v0.8/payload/chunk_05b2.b64 \
+            codigo-estrada-android-build/v0.8/payload/chunk_04.b64 \
+            codigo-estrada-android-build/v0.8/payload/chunk_05.b64 \
             > /tmp/CodigoEstradaPT_Android_v0.8-final.b64
           base64 -d /tmp/CodigoEstradaPT_Android_v0.8-final.b64 > /tmp/CodigoEstradaPT_Android_v0.8-final.zip
           echo "6e14e65867164d5c2ed66087ef2827ebdb3f5b7ccf6256ea32d8f9ce6a01b585  /tmp/CodigoEstradaPT_Android_v0.8-final.zip" | sha256sum -c -
