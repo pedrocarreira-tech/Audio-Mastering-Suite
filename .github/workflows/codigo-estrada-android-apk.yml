@@ -77,6 +77,8 @@ jobs:
           base64 -d /tmp/v11-patch.b64 > /tmp/v11-patch.zip
           echo "c7851ad7c95e9b601ab4d5812e88b3d61ee3877e73e38a178e83240458c4dcdf  /tmp/v11-patch.zip" | sha256sum -c -
           unzip -oq /tmp/v11-patch.zip -d /tmp/codigo-build
+          python3 codigo-estrada-android-build/v1.1/hotfix/apply_crawler_retry.py /tmp/codigo-build/tools/fetch_official_signs.py
+          python3 -m py_compile /tmp/codigo-build/tools/fetch_official_signs.py
           grep -q 'versionName = "1.1.0"' /tmp/codigo-build/app/build.gradle.kts
           grep -q 'versionCode = 11' /tmp/codigo-build/app/build.gradle.kts
           grep -q '2026.09.19-v11-symbols-marks-1600q' /tmp/codigo-build/app/src/main/java/pt/carreira/codigoestrada/ContentData.kt
@@ -114,8 +116,8 @@ jobs:
           SYMBOL_COUNT=$(find app/src/main/res/drawable-nodpi -maxdepth 1 -type f -name 'symbol_*.png' | wc -l)
           echo "Official sign resources: $SIGN_COUNT"
           echo "Official symbol resources: $SYMBOL_COUNT"
-          test "$SIGN_COUNT" -ge 100
-          test "$SYMBOL_COUNT" -ge 1
+          test "$SIGN_COUNT" -ge 200
+          test "$SYMBOL_COUNT" -ge 20
           test -s app/src/main/res/raw/official_sign_catalog.json
           test -s app/src/main/res/raw/official_symbol_catalog.json
           python3 - <<'PY'
@@ -124,8 +126,8 @@ jobs:
           symbols=json.load(open('app/src/main/res/raw/official_symbol_catalog.json',encoding='utf-8'))
           print("Sign catalog records:", len(signs))
           print("Symbol catalog records:", len(symbols))
-          assert len(signs) >= 100
-          assert len(symbols) >= 1
+          assert len(signs) >= 200
+          assert len(symbols) >= 20
           PY
 
       - name: Unit and editorial quality tests
