@@ -63,7 +63,8 @@ jobs:
             codigo-estrada-android-build/v1.1/patch/chunk_01.b64 \
             codigo-estrada-android-build/v1.1/patch/chunk_02a.b64 \
             codigo-estrada-android-build/v1.1/patch/chunk_02b1.b64 \
-            codigo-estrada-android-build/v1.1/patch/chunk_02b2a.b64 \
+            codigo-estrada-android-build/v1.1/patch/chunk_02b2a1.b64 \
+            codigo-estrada-android-build/v1.1/patch/chunk_02b2a2.b64 \
             codigo-estrada-android-build/v1.1/patch/chunk_02b2b.b64 \
             codigo-estrada-android-build/v1.1/patch/chunk_03a.b64 \
             codigo-estrada-android-build/v1.1/patch/chunk_03b.b64 \
