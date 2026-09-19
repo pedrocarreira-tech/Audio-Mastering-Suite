@@ -51,7 +51,7 @@ jobs:
           echo "0774aa90a236c6ea1b1ad1790e5d8d784ddb3ccaaa93867de4856a43b0f10cc8  /tmp/v10-patch.zip" | sha256sum -c -
           unzip -oq /tmp/v10-patch.zip -d /tmp/codigo-build
           cp codigo-estrada-android-build/v1.0/hotfix/fetch_official_signs.py /tmp/codigo-build/tools/fetch_official_signs.py
-          echo "45e11c99d7571b35283c49528ad7156c480630d7b2d9f936b2aa89f095e3c025  /tmp/codigo-build/tools/fetch_official_signs.py" | sha256sum -c -
+          test "$(git hash-object /tmp/codigo-build/tools/fetch_official_signs.py)" = "091fed22f2949c110da43f3b2571e625d4f054d0"
           grep -q 'versionName = "1.0.0"' /tmp/codigo-build/app/build.gradle.kts
           grep -q 'versionCode = 10' /tmp/codigo-build/app/build.gradle.kts
           grep -q '2026.09.19-v10-full-signage-1300q' /tmp/codigo-build/app/src/main/java/pt/carreira/codigoestrada/ContentData.kt
