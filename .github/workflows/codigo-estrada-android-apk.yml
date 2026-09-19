@@ -1,4 +1,4 @@
-name: Codigo Estrada PT - Build v1.0 Full Signage APK
+name: Codigo Estrada PT - Build v1.1 Symbols Marks APK
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
     branches:
       - build/codigo-estrada-android-v0.7
     paths:
-      - 'codigo-estrada-android-build/v1.0/patch/**'
+      - 'codigo-estrada-android-build/v1.1/patch/**'
       - '.github/workflows/codigo-estrada-android-apk.yml'
 
 jobs:
@@ -56,6 +56,27 @@ jobs:
           grep -q 'versionCode = 10' /tmp/codigo-build/app/build.gradle.kts
           grep -q '2026.09.19-v10-full-signage-1300q' /tmp/codigo-build/app/src/main/java/pt/carreira/codigoestrada/ContentData.kt
 
+      - name: Reconstruct and apply verified v1.1 patch
+        run: |
+          cat \
+            codigo-estrada-android-build/v1.1/patch/chunk_00.b64 \
+            codigo-estrada-android-build/v1.1/patch/chunk_01.b64 \
+            codigo-estrada-android-build/v1.1/patch/chunk_02a.b64 \
+            codigo-estrada-android-build/v1.1/patch/chunk_02b.b64 \
+            codigo-estrada-android-build/v1.1/patch/chunk_03.b64 \
+            codigo-estrada-android-build/v1.1/patch/chunk_04a.b64 \
+            codigo-estrada-android-build/v1.1/patch/chunk_04b.b64 \
+            codigo-estrada-android-build/v1.1/patch/chunk_05.b64 \
+            codigo-estrada-android-build/v1.1/patch/chunk_06.b64 \
+            codigo-estrada-android-build/v1.1/patch/chunk_07.b64 \
+            > /tmp/v11-patch.b64
+          base64 -d /tmp/v11-patch.b64 > /tmp/v11-patch.zip
+          echo "c7851ad7c95e9b601ab4d5812e88b3d61ee3877e73e38a178e83240458c4dcdf  /tmp/v11-patch.zip" | sha256sum -c -
+          unzip -oq /tmp/v11-patch.zip -d /tmp/codigo-build
+          grep -q 'versionName = "1.1.0"' /tmp/codigo-build/app/build.gradle.kts
+          grep -q 'versionCode = 11' /tmp/codigo-build/app/build.gradle.kts
+          grep -q '2026.09.19-v11-symbols-marks-1600q' /tmp/codigo-build/app/src/main/java/pt/carreira/codigoestrada/ContentData.kt
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -81,20 +102,26 @@ jobs:
       - name: Install catalog tooling
         run: python3 -m pip install --quiet pillow beautifulsoup4
 
-      - name: Fetch expanded official Portuguese road-sign catalog
+      - name: Fetch official signs and symbols catalog
         working-directory: /tmp/codigo-build
         run: |
           python3 tools/fetch_official_signs.py
-          COUNT=$(find app/src/main/res/drawable-nodpi -maxdepth 1 -type f -name 'sign_*.png' | wc -l)
-          echo "Official sign resources: $COUNT"
-          test "$COUNT" -ge 100
+          SIGN_COUNT=$(find app/src/main/res/drawable-nodpi -maxdepth 1 -type f -name 'sign_*.png' | wc -l)
+          SYMBOL_COUNT=$(find app/src/main/res/drawable-nodpi -maxdepth 1 -type f -name 'symbol_*.png' | wc -l)
+          echo "Official sign resources: $SIGN_COUNT"
+          echo "Official symbol resources: $SYMBOL_COUNT"
+          test "$SIGN_COUNT" -ge 100
+          test "$SYMBOL_COUNT" -ge 1
           test -s app/src/main/res/raw/official_sign_catalog.json
+          test -s app/src/main/res/raw/official_symbol_catalog.json
           python3 - <<'PY'
           import json
-          p='app/src/main/res/raw/official_sign_catalog.json'
-          data=json.load(open(p,encoding='utf-8'))
-          print("Catalog records:", len(data))
-          assert len(data) >= 100
+          signs=json.load(open('app/src/main/res/raw/official_sign_catalog.json',encoding='utf-8'))
+          symbols=json.load(open('app/src/main/res/raw/official_symbol_catalog.json',encoding='utf-8'))
+          print("Sign catalog records:", len(signs))
+          print("Symbol catalog records:", len(symbols))
+          assert len(signs) >= 100
+          assert len(symbols) >= 1
           PY
 
       - name: Unit and editorial quality tests
@@ -109,16 +136,16 @@ jobs:
         run: |
           APK=/tmp/codigo-build/app/build/outputs/apk/debug/app-debug.apk
           test -f "$APK"
-          cp "$APK" CodigoEstradaPT-v1.0.0-premium-debug.apk
-          sha256sum CodigoEstradaPT-v1.0.0-premium-debug.apk | tee CodigoEstradaPT-v1.0.0-premium-debug.apk.sha256
-          unzip -t CodigoEstradaPT-v1.0.0-premium-debug.apk >/dev/null
+          cp "$APK" CodigoEstradaPT-v1.1.0-premium-debug.apk
+          sha256sum CodigoEstradaPT-v1.1.0-premium-debug.apk | tee CodigoEstradaPT-v1.1.0-premium-debug.apk.sha256
+          unzip -t CodigoEstradaPT-v1.1.0-premium-debug.apk >/dev/null
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: CodigoEstradaPT-v1.0.0-Premium-APK
+          name: CodigoEstradaPT-v1.1.0-Premium-APK
           path: |
-            CodigoEstradaPT-v1.0.0-premium-debug.apk
-            CodigoEstradaPT-v1.0.0-premium-debug.apk.sha256
+            CodigoEstradaPT-v1.1.0-premium-debug.apk
+            CodigoEstradaPT-v1.1.0-premium-debug.apk.sha256
           if-no-files-found: error
           retention-days: 30
